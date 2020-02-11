@@ -1,0 +1,45 @@
+
+#Remove all objects except functions.
+rmSpecific_NBA = function(){
+  keep(c("importNBA_Misc", "PacePerYearByTeam", "rmSpecific_NBA"), sure = TRUE)
+}
+
+#Import NBA data
+importNBA_Misc = function(){
+  STATIC_Data01 = read.csv("/Users/zenhwaouyang/Google Drive/Personal - current/Projects/Data projects for fun/NBA - Dataset - Miscellaneous data - ORIGINAL.csv")
+  names(STATIC_Data01)
+  table(STATIC_Data01$Season)
+  str(STATIC_Data01)
+  
+  WORKING_Data01 = STATIC_Data01
+  WORKING_Data01$Season = as.character(WORKING_Data01$Season)
+  str(WORKING_Data01)
+  table(WORKING_Data01$Season)
+  WORKING_Data01$Season[WORKING_Data01$Season == "Apr-03"] = "2003-04"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Aug-07"] = "2007-08"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Dec-11"] = "2011-12"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Feb-01"] = "2001-02"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Jan-00"] = "2000-01"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Jul-06"] = "2006-07"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Jun-05"] = "2005-06"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Mar-02"] = "2002-03"
+  WORKING_Data01$Season[WORKING_Data01$Season == "May-04"] = "2004-05"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Nov-10"] = "2010-11"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Oct-09"] = "2009-10"
+  WORKING_Data01$Season[WORKING_Data01$Season == "Sep-08"] = "2008-09"
+  return(WORKING_Data01)
+}
+
+#Plot pacer per year by team
+PacePerYearByTeam = function(TeamName = NULL){
+  WORKING_Data01 = importNBA_Misc()
+  # debug()
+  if(!is.null(TeamName)){
+    WORKING_Data04 = WORKING_Data01[WORKING_Data01$Name == TeamName, ]
+    p = ggplot(data = WORKING_Data04, aes(x = Season, y = Pace, group = 1)) + theme(axis.text.x = element_text(angle = 45, hjust = 1.1), plot.title = element_text(hjust = 0.5)) + geom_point() + geom_line() + ggtitle(paste0("Pace per year: ", WORKING_Data04$Name[1]))
+  }else{
+    WORKING_Data03 = aggregate(Pace ~ Season, FUN = mean, data = WORKING_Data01)
+    p = ggplot(data = WORKING_Data03, aes(x = Season, y = Pace, group = 1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 45, hjust = 1.1), plot.title = element_text(hjust = 0.5)) + ggtitle(paste0("Pace per year: All teams"))
+  }
+  return(p)
+}
